@@ -8,9 +8,11 @@
 
 #include <stdio.h>
 #include "MySprite2D.h"
+#include <random>
 
 
 USING_NS_CC;
+using namespace std;
 
 MySprite::MySprite()
 : m_Color(cocos2d::Color3B(255,255,255)), m_EnegyCount(1), m_Count(0)
@@ -34,6 +36,10 @@ bool MySprite::initWithFile(std::string file)
     Sprite::initWithFile(file);
     setColor(m_Color);
     
+    default_random_engine generator(clock());
+    static uniform_int_distribution<int> dis(1,100);
+    m_EnegyCount = dis(generator);
+    
     if(m_SpriteType <= _ST_Burden)
     {
         Texture2D *texture = Director::getInstance()->getTextureCache()->getTextureForKey("/cc_fps_images");
@@ -41,6 +47,7 @@ bool MySprite::initWithFile(std::string file)
         m_Count = LabelAtlas::create();
         m_Count->initWithString("0000", texture, 12, 32 , '.');
         m_Count->setPosition(Vec2::ZERO);
+        updateEnegy();
         addChild(m_Count);
         
         auto body = PhysicsBody::createCircle(getContentSize().width/4);
@@ -59,14 +66,18 @@ bool MySprite::initWithFile(std::string file)
 
 void MySprite::update(float dt)
 {
+    updateEnegy();
+}
+
+void MySprite::updateEnegy()
+{
     if(m_Count)
     {
         char str[3] = {0};
         sprintf(str, "%d", m_EnegyCount);
-
+        
         m_Count->setString(str);
     }
-
 }
 
 void MySprite::setBodyContactMask()

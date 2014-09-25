@@ -54,6 +54,7 @@ public:
     
     virtual void setBodyContactMask();
 protected:
+    void updateEnegy();
     std::string         m_ModelFile;
     int                 m_SpriteType;
     cocos2d::Color3B    m_Color;
