@@ -24,7 +24,7 @@ bool test(SpriteLayer *layer)
     //sp1->getPhysicsBody()->setVelocity(Vec2(visibleSize.width / visibleSize.height, 1) * 10);
     layer->addChild(sp1);
     
-    auto sp2 = spF.Create(_ST_Hummer);
+    auto sp2 = spF.Create(_ST_Hammer);
     sp2->setPosition(visibleSize * 3 / 5 + Size(0, -2));
     //sp2->getPhysicsBody()->setVelocity(Vec2(visibleSize.width / visibleSize.height, 1) * -10);
     layer->addChild(sp2);

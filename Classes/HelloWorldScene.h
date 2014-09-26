@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "SpriteLayer.h"
 #include "MyEdgeLayer.h"
+#include "PlayerLayer.h"
 
 class HelloWorld : public cocos2d::Layer
 {
@@ -20,16 +21,9 @@ public:
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
     
-    void update(float dt);
-    
-    
-    void setPhyWorld(cocos2d::PhysicsWorld *A_world) {m_world = A_world;}
-    cocos2d::PhysicsWorld *getPhyWorld() {return m_world;}
+
 protected:
-    cocos2d::PhysicsWorld    *m_world;
-    
-    cocos2d::SpriteLayer             *m_SpriteLayer;
-    cocos2d::MyEdgeLayer             *m_Edgelayer;
+    void testRun();
 };
 
 #endif // __HELLOWORLD_SCENE_H__

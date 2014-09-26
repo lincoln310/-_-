@@ -46,29 +46,46 @@ bool MySprite::initWithFile(std::string file)
     static uniform_int_distribution<int> dis(1,100);
     m_EnegyCount = dis(generator);
     
-    if(m_SpriteType <= _ST_Burden)
+    m_Count = this->initLabel();
+    if(m_Count)
     {
-        Texture2D *texture = Director::getInstance()->getTextureCache()->getTextureForKey("/cc_fps_images");
-        
-        m_Count = LabelAtlas::create();
-        m_Count->initWithString("0000", texture, 12, 32 , '.');
-        m_Count->setPosition(Vec2::ZERO);
-        m_Count->setColor(m_EnegyColor);
         updateEnegy();
         addChild(m_Count);
-        
-        auto body = PhysicsBody::createCircle(getContentSize().width/3);
-        body->getShape(0)->setRestitution(1.0f);
-        //设置物体的摩擦力
-        body->getShape(0)->setFriction(0.0f);
-        //设置物体密度
-        body->getShape(0)->setDensity(1.0f);
+    }
+    
+    auto body = this->initPhyBody();
+    if(body)
+    {
         setPhysicsBody(body);
         setBodyContactMask();
     }
     
     scheduleUpdate();
     return true;
+}
+
+PhysicsBody *MySprite::initPhyBody()
+{
+    auto body = PhysicsBody::createCircle(getContentSize().width/3);
+    body->getShape(0)->setRestitution(1.0f);
+    //设置物体的摩擦力
+    body->getShape(0)->setFriction(0.0f);
+    //设置物体密度
+    body->getShape(0)->setDensity(1.0f);
+    
+    return body;
+}
+
+LabelAtlas *MySprite::initLabel()
+{
+    Texture2D *texture = Director::getInstance()->getTextureCache()->getTextureForKey("/cc_fps_images");
+    
+    m_Count = LabelAtlas::create();
+    m_Count->initWithString("0000", texture, 12, 32 , '.');
+    m_Count->setPosition(Vec2::ZERO);
+    m_Count->setColor(m_EnegyColor);
+    
+    return m_Count;
 }
 
 void MySprite::update(float dt)
@@ -90,10 +107,12 @@ void MySprite::updateEnegy()
 void MySprite::setBodyContactMask()
 {
     auto body = getPhysicsBody();
-    body->setCategoryBitmask(m_SpriteType);
-    body->setContactTestBitmask(_ST_End);
-    body->setCollisionBitmask(_ST_End);
-    
+    if(body)
+    {
+        body->setCategoryBitmask(m_SpriteType);
+        body->setContactTestBitmask(_ST_End);
+        body->setCollisionBitmask(_ST_End);
+    }
 }
 
 Scissor::Scissor()
@@ -104,10 +123,10 @@ Scissor::Scissor()
     m_EnegyColor = g_yellow;
 }
 
-Hummer::Hummer()
+Hammer::Hammer()
 {
     m_ModelFile = "hammer.png";
-    m_SpriteType = _ST_Hummer;
+    m_SpriteType = _ST_Hammer;
     m_Color = g_green;
     m_EnegyColor = g_red;
 }
@@ -120,6 +139,37 @@ Burden::Burden()
     m_EnegyColor = g_green;
 }
 
+Chain::Chain()
+{
+    m_ModelFile = "chain.png";
+    m_SpriteType = _ST_Chain;
+    m_Color = g_blue;
+}
+
+PhysicsBody *Chain::initPhyBody()
+{
+    auto size = getContentSize();
+    auto body = PhysicsBody::createBox(size);
+    body->getShape(0)->setRestitution(1.0f);
+    //设置物体的摩擦力
+    body->getShape(0)->setFriction(0.0f);
+    //设置物体密度
+    body->getShape(0)->setDensity(1.0f);
+    
+    return body;
+}
+
+void Chain::setBodyContactMask()
+{
+    auto body = getPhysicsBody();
+    if(body)
+    {
+        body->setCategoryBitmask(m_SpriteType);
+        body->setContactTestBitmask(_ST_End);
+        body->setCollisionBitmask(_ST_End);
+    }
+}
+
 MySprite *MySprite2DFactory::Create(int type)
 {
     MySprite *ret = nullptr;
@@ -127,11 +177,14 @@ MySprite *MySprite2DFactory::Create(int type)
         case _ST_Scissor:
             ret = new Scissor();
             break;
-        case _ST_Hummer:
-            ret = new Hummer();
+        case _ST_Hammer:
+            ret = new Hammer();
             break;
         case _ST_Burden:
             ret = new Burden();
+            break;
+        case _ST_Chain:
+            ret = new Chain();
             break;
         default:
             break;

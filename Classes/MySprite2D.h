@@ -27,8 +27,10 @@ enum MySpriteType
 {
     _ST_Start   = 0,
     _ST_Scissor = 0x01,
-    _ST_Hummer  = 0x02,
+    _ST_Hammer   = 0x02,
     _ST_Burden  = 0x04,
+    
+    _ST_Chain   = 0x08,
     _ST_End     = 0xff
 };
 
@@ -44,6 +46,8 @@ public:
     
     int getType() {return m_SpriteType;}
     
+    virtual PhysicsBody *initPhyBody();
+    virtual LabelAtlas *initLabel();
     
     int getEnegyCount() {return m_EnegyCount;}
     void addEnegyCount(int cnt) {m_EnegyCount += cnt;}
@@ -63,6 +67,7 @@ protected:
     //enegy related;
     int                 m_EnegyCount;
     cocos2d::LabelAtlas *m_Count;
+    cocos2d::Color3B    m_EnegyColor;
 };
 
 //对象工厂
@@ -77,15 +82,15 @@ class Scissor : public MySprite
 {
     Scissor();
 public:
-    int getEnemy() {return _ST_Hummer;}
+    int getEnemy() {return _ST_Hammer ;}
     int getFood() {return _ST_Burden;}
     
     friend class MySprite2DFactory;
 };
 
-class Hummer : public MySprite
+class Hammer  : public MySprite
 {
-    Hummer();
+    Hammer ();
 public:
     int getEnemy() {return _ST_Burden;}
     int getFood() {return _ST_Scissor;}
@@ -98,7 +103,19 @@ class Burden : public MySprite
     Burden();
 public:
     int getEnemy() {return _ST_Scissor;}
-    int getFood() {return _ST_Hummer;}
+    int getFood() {return _ST_Hammer ;}
+    
+    friend class MySprite2DFactory;
+};
+
+class Chain : public MySprite
+{
+    Chain();
+public:
+    virtual PhysicsBody *initPhyBody();
+    virtual LabelAtlas *initLabel() {return nullptr;}
+    
+    void setBodyContactMask();
     
     friend class MySprite2DFactory;
 };

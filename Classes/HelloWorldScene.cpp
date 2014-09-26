@@ -1,6 +1,5 @@
 #include "HelloWorldScene.h"
-#include "SpriteLayer.h"
-#include "MyEdgeLayer.h"
+#include "MainMenu.h"
 
 USING_NS_CC;
 
@@ -9,15 +8,10 @@ USING_NS_CC;
 Scene* HelloWorld::createScene()
 {
     // 'scene' is an autorelease object
-    auto scene = Scene::createWithPhysics();
-    
-    PhysicsWorld *l_world = scene->getPhysicsWorld();
-    //l_world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
-    l_world->setGravity(Vec2(0, 0));
+    auto scene = Scene::create();
     
     // 'layer' is an autorelease object
     auto layer = HelloWorld::create();
-    layer->setPhyWorld(l_world);
 
     // add layer as a child to scene
     scene->addChild(layer);
@@ -72,25 +66,16 @@ bool HelloWorld::init()
     // add the label as a child to this layer
     this->addChild(label, 1);
     
-    m_Edgelayer = MyEdgeLayer::create();
-    addChild(m_Edgelayer);
-
-    m_SpriteLayer = SpriteLayer::create();
-    addChild(m_SpriteLayer);
+    auto background = Sprite::create("Sea.jpg");
+    background->setAnchorPoint(Vec2(.5, .5));
+    background->setPosition(Director::getInstance()->getVisibleSize() / 2);
+    addChild(background, -1);
     
-    scheduleUpdate();
+    auto l_MainMenu = MainMenu::create();
+    l_MainMenu->setPosition(visibleSize/2);
+    addChild(l_MainMenu);
     
     return true;
-}
-
-void HelloWorld::update(float dt)
-{
-    if(m_SpriteLayer->isNeedNewSprite())
-    {
-        auto sp = m_Edgelayer->getNewSprite();
-        if(sp)
-            m_SpriteLayer->addSprite(sp);
-    }
 }
 
 
