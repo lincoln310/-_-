@@ -12,7 +12,7 @@ Scene* HelloWorld::createScene()
     auto scene = Scene::createWithPhysics();
     
     PhysicsWorld *l_world = scene->getPhysicsWorld();
-    l_world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    //l_world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     l_world->setGravity(Vec2(0, 0));
     
     // 'layer' is an autorelease object

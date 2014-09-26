@@ -34,12 +34,23 @@ bool test(SpriteLayer *layer)
 
 bool SpriteLayer::init()
 {
-    m_SpriteCntLimit = 20;
+    m_SpriteCntLimit = 40;
+    
+    auto visiblesize = Director::getInstance()->getVisibleSize();
     
     //玩家选择精灵事件
     auto selectItemListener = EventListenerCustom::create("remove_sprite", CC_CALLBACK_1(SpriteLayer::onCustomEvent, this));
     _eventDispatcher->addEventListenerWithSceneGraphPriority(selectItemListener, this);
     
+    auto contactEventListener = EventListenerPhysicsContact::create();
+    contactEventListener->onContactBegin = CC_CALLBACK_1(SpriteLayer::onContactBegin, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(contactEventListener, this);
+    
+    auto sp = Sprite::create("Sea.jpg");
+    sp->setAnchorPoint(Vec2(.5, .5));
+    sp->setPosition(visiblesize/2);
+    //sp->setScale(visiblesize.width / sp->getContentSize().width, visiblesize.height / sp->getContentSize().height);
+    addChild(sp, -1);
     scheduleUpdate();
     
     return true;
@@ -82,5 +93,47 @@ bool SpriteLayer::onContactPreSolve(cocos2d::PhysicsContact &contact, cocos2d::P
 
 bool SpriteLayer::onContactBegin(const cocos2d::PhysicsContact &contact)
 {
-    return true;
+    try {
+        MySprite *sp1 = static_cast<MySprite*>(contact.getShapeA()->getBody()->getNode());
+        MySprite *sp2 = static_cast<MySprite*>(contact.getShapeB()->getBody()->getNode());
+        
+        if(!sp1 || !sp2)
+            return true;
+        MySprite *hunter = nullptr;
+        MySprite *prey = nullptr;
+        
+        if(sp1->getType() == sp2->getType())
+        {
+            return false;
+        }
+        else if(sp1->getFood() == sp2->getType())
+        {
+            hunter = sp1;
+            prey = sp2;
+        }
+        else if(sp1->getEnemy() == sp2->getType())
+        {
+            hunter = sp2;
+            prey = sp1;
+        }
+        
+        if(hunter && prey)
+        {
+            int hunterEnegyCnt = hunter->getEnegyCount();
+            int preyEnegyCnt = prey->getEnegyCount();
+            if(hunterEnegyCnt >= preyEnegyCnt)
+            {
+                hunter->addEnegyCount(preyEnegyCnt);
+                removeSprite(prey);
+            }
+            else
+            {
+                hunter->addEnegyCount(hunterEnegyCnt);
+                prey->addEnegyCount( -1 * hunterEnegyCnt);
+            }
+        }
+        return true;
+    } catch (...) {
+        return true;
+    }
 }

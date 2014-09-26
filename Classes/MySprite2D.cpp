@@ -14,6 +14,12 @@
 USING_NS_CC;
 using namespace std;
 
+Color3B g_red(236,68,67);
+Color3B g_blue(64,135,194);
+Color3B g_green(60,184,89);
+Color3B g_yellow(253,209,70);
+
+
 MySprite::MySprite()
 : m_Color(cocos2d::Color3B(255,255,255)), m_EnegyCount(1), m_Count(0)
 {
@@ -47,10 +53,11 @@ bool MySprite::initWithFile(std::string file)
         m_Count = LabelAtlas::create();
         m_Count->initWithString("0000", texture, 12, 32 , '.');
         m_Count->setPosition(Vec2::ZERO);
+        m_Count->setColor(m_EnegyColor);
         updateEnegy();
         addChild(m_Count);
         
-        auto body = PhysicsBody::createCircle(getContentSize().width/4);
+        auto body = PhysicsBody::createCircle(getContentSize().width/3);
         body->getShape(0)->setRestitution(1.0f);
         //设置物体的摩擦力
         body->getShape(0)->setFriction(0.0f);
@@ -93,21 +100,24 @@ Scissor::Scissor()
 {
     m_ModelFile = "scissor.png";
     m_SpriteType = _ST_Scissor;
-    m_Color = Color3B(242,88,77);
+    m_Color = g_red;
+    m_EnegyColor = g_yellow;
 }
 
 Hummer::Hummer()
 {
     m_ModelFile = "hammer.png";
     m_SpriteType = _ST_Hummer;
-    m_Color = Color3B(250, 203, 118);
+    m_Color = g_green;
+    m_EnegyColor = g_red;
 }
 
 Burden::Burden()
 {
     m_ModelFile = "burden.png";
     m_SpriteType = _ST_Burden;
-    m_Color = Color3B(73,145,1);
+    m_Color = g_yellow;
+    m_EnegyColor = g_green;
 }
 
 MySprite *MySprite2DFactory::Create(int type)
