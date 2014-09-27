@@ -24,58 +24,82 @@ PlayerLayer *PlayerLayer::create(cocos2d::PhysicsWorld *A_World)
     return nullptr;
 }
 
-void PlayerLayer::Launch(cocos2d::Vec2 A_TarPos)
+void PlayerLayer::drawBack(Node *tar)
 {
-    if(m_JointSpring)
-    {
-        if(m_JointSpring->getRestLength() != 0)
-            return;
-        //float l_dis = A_TarPos.distance(m_CurItem->getPosition());
-        m_Chain->getPhysicsBody()->applyForce(A_TarPos - m_Chain->getPosition());
-    }
-    
+    m_DrawBack = true;
+    m_CurItem->getPhysicsBody()->setLinearDamping(5);
+}
+void PlayerLayer::Launch(Node *tar)
+{
+    m_DrawBack = false;
+    m_CurItem->getPhysicsBody()->setLinearDamping(0);
+    Vec2 l_curPos = m_CurItem->getPosition();
+    m_Joint->setMax(l_curPos.distance(m_TouchPos));
 }
 
 bool PlayerLayer::init()
 {
+    m_DrawBack = false;
     auto vsbSize = Director::getInstance()->getVisibleSize();
     
     MySprite2DFactory spf;
-    //m_Chain = spf.Create(_ST_Chain);
-    //m_Chain->setPosition(vsbSize.width / 2, vsbSize.height - m_Chain->getContentSize().height * 2);
-    //addChild(m_Chain);
     
-    m_Orig = Node::create();
-    auto l_origBody = PhysicsBody::createCircle(10);
-    l_origBody->setContactTestBitmask(0);
-    m_Orig->setPhysicsBody(l_origBody);
-    m_Orig->setPosition(vsbSize.width / 2, vsbSize.height - 20);
+    m_boat = Sprite::create();
+    auto l_boatBody = PhysicsBody::create();
+    l_boatBody->setCollisionBitmask(0);
+    l_boatBody->setDynamic(false);
+    m_boat->setPhysicsBody(l_boatBody);
+    m_boat->setPosition(vsbSize.width / 2, vsbSize.height - 20);
+    m_boat->setVisible(false);
+    addChild(m_boat);
 
-    if(m_CurItem == nullptr)
-    {
-        //m_CurItem = m_DefaultItem;
-        m_CurItem = spf.Create(_ST_Hammer);
-        m_CurItem->setPosition(m_Orig->getPosition());
-        m_CurItem->setColor(Color3B::BLACK);
-        addChild(m_CurItem);
-    }
-    
-    //m_JointSpring = PhysicsJointSpring::construct(m_Orig->getPhysicsBody(), m_CurItem->getPhysicsBody(), Vec2::ZERO, Vec2::ZERO, 500.f, 0.3f);
-    //m_World->addJoint(m_JointSpring);
-    
-    //m_JointPin = PhysicsJointPin::construct(m_Chain->getPhysicsBody(), m_CurItem->getPhysicsBody(), Vec2::ZERO);
-    //m_World->addJoint(m_JointPin);
 
+    m_CurItem = spf.Create(_ST_Hammer);
+    m_CurItem->setPosition(m_boat->getPosition());
+    m_CurItem->setColor(Color3B::BLACK);
+    m_CurItem->getPhysicsBody()->setLinearDamping(0.5);
+    addChild(m_CurItem);
+    
+    m_Joint = PhysicsJointLimit::construct(m_boat->getPhysicsBody(), m_CurItem->getPhysicsBody(), Vec2::ZERO, Vec2::ZERO, 0, 1000);
+    m_World->addJoint(m_Joint);
     
     auto eventTouchListenner = EventListenerTouchOneByOne::create();//create();
     eventTouchListenner->onTouchBegan = CC_CALLBACK_2(PlayerLayer::onTouchBegan, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(eventTouchListenner, this);
     
+    
+    scheduleUpdate();
     return true;
+}
+
+void PlayerLayer::update(float dt)
+{
+    if(m_DrawBack)
+    {
+        float l_max = m_Joint->getMax();
+        if(l_max > 0)
+        {
+            float l_delta = dt * 100;
+            if(l_max > l_delta)
+                m_Joint->setMax(l_max - l_delta);
+            else
+            {
+                m_Joint->setMax(0);
+                m_DrawBack = false;
+            }
+        }
+    }
 }
 
 bool PlayerLayer::onTouchBegan(Touch *touch, Event *event)
 {
-    Launch(touch->getLocation());
+    m_TouchPos = touch->getLocation();
+    auto l_pushFunc = CallFuncN::create(CC_CALLBACK_1(PlayerLayer::Launch, this));
+    auto l_act = MoveTo::create(2, m_TouchPos);
+    //auto l_act = EaseExponentialOut::create(l_act1);
+    auto l_drawBackFunc = CallFuncN::create(CC_CALLBACK_1(PlayerLayer::drawBack, this));
+    
+    m_CurItem->runAction(Sequence::create(l_pushFunc, l_act, l_drawBackFunc, NULL));
+
     return false;
 }

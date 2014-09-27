@@ -28,23 +28,29 @@ public:
     //更换要使用的精灵
     void ChangeItem(MySprite *A_TarItem);
 
+    void update(float dt);
     
-    //发射精灵
-    void Launch(Vec2 A_TarPos);
 protected:
     bool onTouchBegan(Touch *touch, Event *event);
+    
+    //收回精灵
+    void drawBack(Node *tar);
+    //发射精灵
+    void Launch(Node *tar);
     
     MySprite *m_CurItem;
     std::set<MySprite*> m_AllItems;
     
-    PhysicsJointPin *m_JointPin;
-    PhysicsJointSpring  *m_JointSpring;
+    PhysicsJoint *m_JointPin;
+    PhysicsJointLimit *m_Joint;
     bool        m_AddedJoints;
     PhysicsWorld *m_World;
     
-    Node        *m_DefaultItem;
-    Node        *m_Orig;
-    MySprite    *m_Chain;
+    Sprite      *m_boat;
+    Vec2        m_OrigPos;
+    
+    Vec2        m_TouchPos;
+    bool        m_DrawBack;
 };
 
 NS_CC_END

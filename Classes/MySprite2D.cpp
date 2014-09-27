@@ -66,7 +66,7 @@ bool MySprite::initWithFile(std::string file)
 
 PhysicsBody *MySprite::initPhyBody()
 {
-    auto body = PhysicsBody::createCircle(getContentSize().width/3);
+    auto body = PhysicsBody::createCircle(getContentSize().width/2);
     body->getShape(0)->setRestitution(1.0f);
     //设置物体的摩擦力
     body->getShape(0)->setFriction(0.0f);
